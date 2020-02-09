@@ -1,0 +1,70 @@
+[ 
+    {
+        "streamId": "5e3902d4bb48860a8c687530",
+        "streamName": "Advertisement",
+        "streamDate": "2020-01-12T18:30:00.000+00:00",
+        "followers": [
+            {
+                "auditorName": "a"
+            },
+            {
+                "auditorName": "b"
+            }
+        ],
+        "streamLogo":"https://img.freepik.com/free-vector/illustration-light-bulb-icon_53876-43730.jpg?size=338&ext=jpg"
+    },
+    {
+        "streamId": "5e3907dabb48860a8c687531",
+        "streamName": "Innovation",
+        "streamDate": "2020-01-13T18:30:00.000+00:00",
+        "followers": [
+            {
+                "auditorName": "a"
+            },
+            {
+                "auditorName": "b"
+            }
+        ],
+        "streamLogo":"http://icon-library.com/images/advertising-icon/advertising-icon-12.jpg"
+    },
+    {
+        "streamId": "5e3908dbbb48860a8c687532",
+        "streamName": "Promotion",
+        "streamDate": "2020-01-14T18:30:00.000+00:00",
+        "followers": [
+            {
+                "auditorName": "a"
+            },
+            {
+                "auditorName": "b"
+            }
+        ],
+        "streamLogo":"https://clipartart.com/images/promo-icon-clipart-1.jpg"
+    },
+    {
+        "streamId": "5e39097cbb48860a8c687533",
+        "streamName": "Sports",
+        "streamDate": "2020-01-14T18:30:00.000+00:00",
+        "followers": [
+            {
+                "auditorName": "a"
+            },
+            {
+                "auditorName": "b"
+            },
+            {
+                "auditorName": "c"
+            },
+            {
+                "auditorName": "d"
+            },
+            {
+                "auditorName": "e"
+            },
+            {
+                "auditorName": "f"
+            }
+        ],
+        "streamLogo":"https://cdn1.iconfinder.com/data/icons/sports-games-13/24/Cricket_Ball-512.png"
+    }
+]

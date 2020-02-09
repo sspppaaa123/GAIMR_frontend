@@ -1,0 +1,138 @@
+   [ 
+        {
+            "postId": "5e32c1b3032d30222c262698",
+            "postType": "image",
+            "streamName": "Promotion",
+            "ispollExists": true,
+            "postContent": {
+                "text": "For Your Thirst #Coke",
+                "image": "http://rmta-test-posts.s3.ap-south-1.amazonaws.com/Posts/cokeAd.jpg_01-30-2020T17:14:50"
+            },
+            "postDate": "2020-01-29T14:22:03.000+0000",
+            "hashtags": [
+                {
+                    "tagName": "coke"
+                }
+            ],
+            "poll": {
+                "question": "Worth it?",
+                "choices": [
+                    {
+                        "choice": "yes",
+                        "choiceNo": 1,
+                        "votes": 14
+                    },
+                    {
+                        "choice": "no",
+                        "choiceNo": 2,
+                        "votes": 3
+                    }
+                ]
+            },
+            "postActivity": {
+                "auditorLikes": [
+                    {
+                        "name": "a",
+                        "likeDate": "2020-01-29T14:24:03.000+00:00" 
+                    },
+                    {
+                        "name": "b",
+                        "likeDate": "2020-01-29T14:26:03.000+00:00"
+                    },
+                    {
+                        "name": "c",
+                        "likeDate": "2020-01-29T14:29:03.000+00:00"
+                    },
+                    {
+                        "name": "a",
+                        "likeDate": "2020-01-29T14:31:03.000+00:00"
+                    },                    
+                    {
+                        "name": "a",
+                        "likeDate": "2020-01-29T14:32:03.000+00:00"
+                    },
+                    {
+                        "name": "a",
+                        "likeDate": "2020-01-29T14:35:03.000+00:00"
+                    }
+                ]
+            }
+        },
+
+        {
+            "postId": "5e31477823d1e917febec421",
+            "postType": "text",
+            "streamName": "Advertisement",
+            "ispollExists": true,
+            "postContent": {
+                "text": "My First Text post #Pepsi"
+            },
+            "postDate": "2020-01-28T14:20:03.000+0000",
+            "hashtags": [
+                {
+                    "tagName": "pepsi"
+                }
+            ],
+            "poll": {
+                "question": "good?",
+                "choices": [
+                    {
+                        "choice": "yes",
+                        "choiceNo": 1,
+                        "votes": 8
+                    },
+                    {
+                        "choice": "no",
+                        "choiceNo": 2,
+                        "votes": 5
+                    }
+                ]
+            },
+            "postActivity": {
+                "auditorLikes": [
+                    {
+                        "name": "a",
+                        "likeDate": "2020-01-29T14:12:03.000+00:00"
+                    },
+                    {
+                        "name": "a",
+                        "likeDate": "2020-01-29T14:17:03.000+00:00"
+                    },
+                    {
+                        "name": "a",
+                        "likeDate": "2020-01-29T14:20:03.000+00:00"
+                    },
+                    {
+                        "name": "a",
+                        "likeDate": "2020-01-29T14:22:03.000+00:00"
+                    },
+                    {
+                        "name": "a",
+                        "likeDate": "2020-01-29T14:30:03.000+00:00"
+                    },
+                    {
+                        "name": "a",
+                        "likeDate": "2020-01-29T14:45:03.000+00:00"
+                    }
+                ]
+            }
+        },
+        {
+            "postId": "5e31476623d1e917febec420",
+            "postType": "text",
+            "streamName": "Sports",
+            "ispollExists": false,
+            "postContent": {
+                "text": "India vs NZ Today"
+            },
+            "postDate": "2020-02-05T06:28:05.272+00:00",
+            "hashtags": [
+                {
+                    "tagName": "cricket"
+                }
+            ],
+            "poll": null,
+            "postActivity": null
+            
+        }
+    ]

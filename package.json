@@ -1,0 +1,54 @@
+{
+  "name": "gaimr_frontend",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^10.0.6",
+    "@react-native-community/masked-view": "^0.1.6",
+    "hoist-non-react-statics": "^3.3.2",
+    "install": "^0.13.0",
+    "npm": "^6.13.7",
+    "react": "16.9.0",
+    "react-facebook": "^8.1.4",
+    "react-native": "^0.61.5",
+    "react-native-cardview": "^2.0.5",
+    "react-native-circular-action-menu": "^0.5.0",
+    "react-native-document-picker": "^3.2.4",
+    "react-native-elements": "^1.2.7",
+    "react-native-fb-like-button": "0.0.1",
+    "react-native-gesture-handler": "^1.5.6",
+    "react-native-image-picker": "^2.2.1",
+    "react-native-ionicons": "^4.6.4",
+    "react-native-material-bottom-navigation": "^1.0.5",
+    "react-native-parallax-scroll-view": "^0.21.3",
+    "react-native-reanimated": "^1.7.0",
+    "react-native-safe-area-context": "^0.6.4",
+    "react-native-screens": "^2.0.0-beta.2",
+    "react-native-search-bar": "^3.5.1",
+    "react-native-vector-icons": "^6.6.0",
+    "react-navigation": "^4.1.1",
+    "react-navigation-drawer": "^2.3.3",
+    "react-navigation-stack": "^2.1.1",
+    "react-navigation-tabs": "^2.7.0"
+  },
+  "devDependencies": {
+    "@babel/core": "7.8.4",
+    "@babel/runtime": "7.8.4",
+    "@react-native-community/eslint-config": "0.0.5",
+    "babel-jest": "24.9.0",
+    "eslint": "6.8.0",
+    "jest": "24.9.0",
+    "metro-react-native-babel-preset": "0.56.4",
+    "react-test-renderer": "16.9.0"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}
