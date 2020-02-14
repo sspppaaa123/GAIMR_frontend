@@ -11,6 +11,7 @@ export default class LikeButton extends React.Component {
 	likeImage = async () => {
 		const likeState = await !this.state.liked
 		this.setState({ liked: likeState })
+		this.props.onLike();
 	}
 	render() {
 		const { liked } = this.state

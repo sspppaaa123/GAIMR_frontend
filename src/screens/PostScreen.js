@@ -38,10 +38,58 @@ export default class PostScreen extends React.Component {
         },
         postText: "",
         streamSelected: "Select Stream",
+        isPosting:true,
         selectedImage: null,
-        isPolling:false,
+        pollAdded:-1,
         visible: false,
+        isLoading:true,
+        streams:[],
+        ip:"http://gaimr-boot.herokuapp.com"
     }
+}
+init()
+{
+    fetch(this.state.ip+'/streams')
+    .then((response) => response.json())
+    .then((responseJson) => {
+      console.log(responseJson)
+      this.setState({
+        isLoading: false,
+        streams: responseJson,
+      }, function () {
+      });
+
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+componentDidMount()
+{
+    this.init();
+}
+resetView=()=>
+{
+    let post=this.state.postRequest;
+    post.postType="";
+    post.streamName="";
+    post.pollExists=false;
+    post.postContent={
+        text: "",
+        image: null
+    };
+    post.postDate="";
+    post.hashtags=[];
+    post.poll={}
+    post.postActivity= {
+        auditorLikes: []
+    }
+    this.setState(
+        {
+            streamSelected:"Select Stream",
+            postRequest:post
+        }
+    )
 }
 postHandler = () => {
     if (this.state.streamSelected === "Select Stream") {
@@ -80,11 +128,23 @@ postHandler = () => {
                 console.log("sending..", newPostRequest);
                 fd.append("post", JSON.stringify(newPostRequest));
                 console.log("fd", fd);
-                fetch("http://192.168.1.17:8080/posts/addPost", {
+                fetch(this.state.ip+"/posts/addPost", {
                     method: "POST",
                     body: fd
                 }).then((response) => response.json())
-                    .then((responseJSON) => { console.log(responseJSON) })
+                    .then((responseJSON) => { 
+                        console.log(responseJSON) 
+                        this.setState({
+                            isPosting:false,
+                            selectedImage:null,
+                            visible:false,
+                            pollAdded:-1
+                            },function(){
+                                this.resetView();
+                            }
+                        )
+                        alert("posted!")
+                    })
                     .then(error => { console.log("err", error) })
             }
         }
@@ -96,7 +156,7 @@ onChangePostText = text => {
     })
 }
 imageSelectHandler = () => {
-    ImagePicker.showImagePicker({ title: "Pick Image" }, res => {
+    ImagePicker.showImagePicker({ title: "Pick Image" ,maxWidth:800,maxHeight:600}, res => {
         if (res.didCancel) {
             console.log("Cancelled")
         }
@@ -119,23 +179,44 @@ deselectImage=()=>
 }
 addPoll=(poll,choices)=>
 {
+    for(let i=0;i<choices.length;i++)
+    {
+        let choice=choices[i];
+        delete choice.placeholder;
+    }
     poll.choices=choices;
     let post=this.state.postRequest;
     post.pollExists=true;
     post.poll=poll;
     this.setState({
-        postRequest:post
+        postRequest:post,
+        pollAdded:1,
+        visible:false
     })
     console.log("post",this.state.postRequest);
     }
-    onChangeState=()=>
-    {
-        this.setState({
-            isPolling:true
-        })
-    }
+    // onChangeState=()=>
+    // {
+    //     this.setState({
+    //         isPolling:true
+    //     })
+    // }
 render() {
     let imageSelected = null;
+    let pollAdded=null;
+    let streamsList=[];
+    if(this.state.streams.length>0)
+    {
+        for(let i=0;i<this.state.streams.length;i++)
+        {
+            let stream=this.state.streams[i]
+            if(stream.streamName!="All")
+            streamsList.push(
+                <Picker.Item key={stream.streamId} 
+                label={stream.streamName} value={stream.streamName}/>
+            )
+        }
+    }
     if (this.state.selectedImage != null) {
         imageSelected = (
             <View style={styles.selectedImageContainer}>
@@ -143,6 +224,14 @@ render() {
                 <TouchableOpacity onPress={this.deselectImage} style={styles.close}>
                 <Ionicons name="ios-close-circle" size={25} />
                 </TouchableOpacity>
+            </View>
+        )
+    }
+    if(this.state.pollAdded===1)
+    {
+        pollAdded=(
+            <View style={{width:"100%",alignItems:"center",marginTop:15}}>
+                <Text style={{fontWeight:"bold",color:"blue"}}>Poll Added!</Text>
             </View>
         )
     }
@@ -157,15 +246,20 @@ render() {
                         this.setState({ streamSelected: itemValue })
                     }>
                     <Picker.Item label="Select Stream" value="Select Stream" />
-                    <Picker.Item label="Advertisement" value="Advertisement" />
+                    {/* <Picker.Item label="Advertisement" value="Advertisement" />
                     <Picker.Item label="Innovation" value="Innovation" />
                     <Picker.Item label="Promotion" value="Promotion" />
                     <Picker.Item label="Sports" value="Sports" />
+                    <Picker.Item label="News" value="News" />
+                    <Picker.Item label="Movies" value="Movies" /> */}
+                    {streamsList}
                 </Picker>
             </View>
             <View style={styles.bottomView}>
             <View style={styles.textstyle} >
-            <TextInput placeholder="Post something.." style={styles.textPost} onChangeText={(text) => this.onChangePostText(text)} />
+            <TextInput placeholder="Post something.." style={styles.textPost} 
+            onChangeText={(text) => this.onChangePostText(text)}
+            />
             </View>
             <View style={styles.sendstyle}>
             <TouchableOpacity onPress={this.postHandler}>
@@ -178,14 +272,14 @@ render() {
             </TouchableOpacity>
             </View>
             <View style={styles.pollstyle}>
-            <TouchableOpacity onPress={()=>{this.setState({visible: true})}} >
+            <TouchableOpacity onPress={()=>{this.setState({visible: true,pollAdded:0})}} >
                 <Ionicons name="ios-stats" size={25} />
             </TouchableOpacity>
-            {/* <AddPollComponent addPoll={this.addPoll} onStateChange={this.onChangeState}/> */}
             </View>
             </View>
             {imageSelected}
-            {this.state.visible ? <AddPollComponent addPoll={this.addPoll} onStateChange={this.onChangeState}/> : null}
+            {this.state.visible ? <AddPollComponent addPoll={this.addPoll}/> : null}
+            {pollAdded}
             </ScrollView>
         </View>
     )
