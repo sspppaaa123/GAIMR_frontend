@@ -5,10 +5,12 @@ import PostScreen from "../screens/PostScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import SearchScreen from "../screens/SearchScreen";
 import TrendingPostsScreen from "../screens/TrendingPostsScreen";
+import AddStreamScreen from "../screens/AddStreamScreen";
 
 //Add navigators with screens in this file
 export const HomeNavigator = createStackNavigator({
-  Home: { screen: HomeScreen }
+  Home: { screen: HomeScreen },
+  AddStream:{screen:AddStreamScreen ,navigationOptions:{title:"Add Stream"}}
 });
 
 export const SearchNavigator = createStackNavigator({

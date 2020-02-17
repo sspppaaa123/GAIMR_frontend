@@ -1,0 +1,1 @@
+export const APIURL="http://gaimr-boot.herokuapp.com"

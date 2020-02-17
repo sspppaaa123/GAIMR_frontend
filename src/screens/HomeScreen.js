@@ -1,187 +1,3 @@
-// import React, { Component } from "react";
-// import { MenuButton, Logo, Middle } from "../components/header/header";
-// import {FlatList, ActivityIndicator, SafeAreaView, Text, View, TouchableOpacity, StyleSheet, Button, Image} from 'react-native';
-
-// const DATA = [
-//   {
-//     id: '1',
-//     title: 'First Item',
-//     image:require('../assets/news.png')
-//   },
-//   {
-//     id: '2',
-//     title: 'Second Item',
-//     image:require('../assets/advt.png')
-//   },
-//   {
-//     id: '3',
-//     title: 'Third Item',
-//     image:require('../assets/health.png')
-//   },
-//   {
-//     id: '4',
-//     title: 'Fourth Item',
-//     image:require('../assets/sports.png')
-//   },
-//   {
-//     id: '5',
-//     title: 'Fifth Item',
-//     image:require('../assets/finance.png')
-//   },
-//   {
-//     id: '6',
-//     title: 'Sixth Item',
-//     image:require('../assets/film.png')
-//   },
-//   {
-//     id: '7',
-//     title: 'Seventh Item',
-//     image:require('../assets/coke.png')
-//   },
-//   {
-//     id: '8',
-//     title: 'Eight Item',
-//     image:require('../assets/market.png')
-//   },
-//   {
-//     id: '9',
-//     title: 'Fifth Item',
-//     image:require('../assets/drug.png')
-//   },
-// ];
-
-// export default class HomeScreen extends React.Component {
-//   static navigationOptions = ({ navigation }) => {
-//     return {
-//       headerLeft: ()=><MenuButton onPress={() => navigation.openDrawer()} />,
-//       headerRight:()=> (<Logo />),
-//     };
-//   };
-
-//   constructor(props){
-//     super(props);
-//     this.state ={ isLoading: true, item: null, dataSource:[],}
-//   }
-
-
-//   componentDidMount(){
-//     return fetch('http://10.231.20.97:8080/posts/recentPosts')
-//       .then((response) => response.json())
-//       .then((responseJson) => {
-//         this.setState({
-//           isLoading: false,
-//           dataSource: responseJson,
-//         }, function(){
-//         });
-
-//       })
-//       .catch((error) =>{
-//         console.error(error);
-//       });
-//   }
-
-//   renderItem = ({ item }) => {
-//     let postView=null;
-//     let pollView=null;
-//     if(item.postType==="text")
-//     {
-//       postView=(
-//         <Text>{item.postContent.text}</Text>
-//       )
-//     }
-//     else if(item.postType=="image")
-//     {
-//       postView=(
-//         <View>
-//           <Text>{item.postContent.text}</Text>
-//           <Image source={{ uri: item.postContent.image }}
-//             style={{ width: 400, height: 400 }} />
-//         </View>
-//       )
-//     }
-//     if(item.pollExists)
-//     {
-//       var choices=[];
-//       for(let i=0;i<item.poll.choices.length;i++)
-//       {
-//         let choice=item.poll.choices[i];
-//         choices.push(
-//           <View key={choice.choiceNo}>
-//             <TouchableOpacity style={styles.choiceContainer}>
-//               <Text style={{fontSize:18}}>{choice.choice}</Text>
-//               <View style={{alignItems:"flex-end",flex:1}}>
-//               <Text style={{fontSize:18,color:"blue"}}>{choice.votes}</Text>
-//               </View>
-//             </TouchableOpacity>
-//           </View>
-//         )
-//       }
-//       pollView=(
-//         <View>
-//           <Text style={{fontWeight:"bold"}}>{item.poll.question}</Text>
-//           {choices}
-//         </View>
-//       )
-//     }
-//     return (
-//       <View style={styles.MainContainer}>
-//         <TouchableOpacity>
-//         {postView}
-//         {pollView}
-//         </TouchableOpacity>
-//       </View>
-//     )
-//   }
-
-//  render(){
-//   return (
-//     <SafeAreaView style={styles.container}>
-
-//       <FlatList
-//         horizontal={true}
-//         data={DATA}
-//         renderItem={({ item }) =>(<View style={{padding:10,paddingTop:30,paddingBottom:30}}><TouchableOpacity ><Image source={item.image} style={{width:50,height:50}} /></TouchableOpacity></View>)}
-//         keyExtractor={item => item.id}
-//       />
-//       <FlatList
-//          data={this.state.dataSource}
-//          renderItem={this.renderItem}
-//          keyExtractor={item => item.postId}
-//       />
-//     </SafeAreaView>
-//   );  
-// }
-// }
-
-// const styles = StyleSheet.create({
-
-//   MainContainer: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: '#bedffa',
-//     width:'100%',
-
-//   },
-
-//   cardViewStyle:{
-//     width: 400, 
-//     height: 200,
-//     padding: 30,
-//   },
-
-//   cardView_InsideText:{
-//     fontSize: 20, 
-//     color: '#000', 
-//     textAlign: 'center', 
-//     marginTop: 50    
-
-//   },
-
-// });
-
-
-
 import React, { Component } from "react";
 import { MenuButton, Logo, Middle } from "../components/header/header";
 import { FlatList, SafeAreaView, Text, View, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
@@ -190,6 +6,7 @@ import { Card, ListItem, Button, Icon } from 'react-native-elements';
 import LikeButton from '../components/LikeButton'
 import ImageLoader from 'react-native-image-progress';
 import * as Progress from 'react-native-progress';
+import AddStream from "../components/AddStreamComponent";
 export default class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
@@ -387,23 +204,6 @@ export default class HomeScreen extends React.Component {
         choices.push(
           <View key={choice.choiceNo}>
             <TouchableOpacity onPress={this.votepoll.bind(this, item.postId, choice.choiceNo)}>
-              {/* <View style={styles.pollstyle}>
-                <View style={{flex:1}}>
-                <Text style={{marginLeft:5}}>{choice.choice}</Text>
-                <View style={voteStyle}>
-                <Text style={{ textAlign: 'right', alignSelf: 'stretch' }}>
-                    {votePercent}</Text>
-                </View>
-                </View> */}
-
-              {/* <View style={
-                  { backgroundColor: this.state.bgcolor,
-                     flex: 1, padding: 10, fontWeight: 400, fontSize: 20, 
-                     alignContent: "flex-end" }
-                  }>
-                  
-                </View> */}
-              {/* </View> */}
               <View style={{ flexDirection: "row", wdith: "100%", height: 50, backgroundColor: "#bbb", margin: 5 }}>
                 <View style={voteStyle}>
                 </View>
@@ -460,7 +260,12 @@ export default class HomeScreen extends React.Component {
   onRefresh = () => {
     this.setState({ isLoading: true }, function () { this.init() })
   }
+  goToNewStreamsPage=()=>
+  {
+    this.props.navigation.navigate('AddStream')
+  }
   render() {
+    const listFooter=(<AddStream newStream={()=>{this.goToNewStreamsPage()}}/>)
     console.log("rendering..", this.state.streams);
     return (
       <SafeAreaView style={styles.container}>
@@ -469,13 +274,18 @@ export default class HomeScreen extends React.Component {
             progress={this.state.progress}
             indeterminate={this.state.isLoading}
           /> */}
+          <View style={styles.streamContainer}>
         <FlatList
           horizontal={true}
           data={this.state.streams}
           renderItem={this.renderStreams}
           keyExtractor={item => item.streamId}
-          style={{ height: "20%" }}
+          ListFooterComponent={listFooter}
+          ListFooterComponentStyle={{justifyContent:"center",marginBottom:15
+        ,padding:10}}
+          style={{ flex:1 }}
         />
+        </View>
         <FlatList
           data={this.state.posts}
           renderItem={this.renderItem}
@@ -534,5 +344,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "blue",
     fontSize: 15
+  },
+  streamContainer:
+  {
+    flexDirection:"row",
+    height:"20%"
   }
 });

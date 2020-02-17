@@ -319,17 +319,37 @@ export default class TrendingPostsScreen extends React.Component {
     }
     if (item.pollExists) {
       var choices = [];
+      var sum = 0;
+      for (let i = 0; i < item.poll.choices.length; i++) {
+        let c = item.poll.choices[i];
+        sum += c.votes;
+      }
       for (let i = 0; i < item.poll.choices.length; i++) {
         let choice = item.poll.choices[i];
+        let votePercent = ((choice.votes / sum) * 100).toFixed(2);
+        if (!isNaN(votePercent)) {
+          votePercent += "%"
+        }
+        else {
+          votePercent = "0%"
+        }
+        const voteStyle = {
+          backgroundColor: "#69a2ff",
+          padding: 10,
+          width: votePercent,
+          height: "100%"
+        }
         choices.push(
           <View key={choice.choiceNo}>
             <TouchableOpacity onPress={this.votepoll.bind(this, item.postId, choice.choiceNo)}>
-              <View style={styles.pollstyle}>
-                <View style={{ backgroundColor: this.state.bgcolor, flex: 1, padding: 10, fontWeight: 400, fontSize: 20 }}>
-                  <Text>{choice.choice}</Text>
+              <View style={{ flexDirection: "row", wdith: "100%", height: 50, backgroundColor: "#bbb", margin: 5 }}>
+                <View style={voteStyle}>
                 </View>
-                <View style={{ backgroundColor: this.state.bgcolor, flex: 1, padding: 10, fontWeight: 400, fontSize: 20, alignContent: "flex-end" }}>
-                  <Text style={{ textAlign: 'right', alignSelf: 'stretch' }}>{choice.votes}</Text>
+                <View style={{ position: "absolute", justifyContent: 'flex-start' }}>
+                  <Text style={{ marginLeft: 5, fontSize: 18, marginTop: 5 }}>{choice.choice}</Text>
+                </View>
+                <View style={{ position: "absolute", justifyContent: "flex-end", end: 0 }}>
+                  <Text style={{ fontSize: 18, marginTop: 5 }}>{votePercent}</Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -337,8 +357,13 @@ export default class TrendingPostsScreen extends React.Component {
         )
       }
       pollView = (
-        <View>
+        <View style={{flex:1}}>
+          <View style={{flex:1,flexDirection:"row"}}>
           <Text style={styles.question}>{item.poll.question}</Text>
+          <View style={{alignItems:"flex-end",flex:1,justifyContent:"center"}}>
+          <Text>{sum} votes</Text>
+          </View>
+          </View>
           {choices}
         </View>
       )
