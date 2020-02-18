@@ -39,6 +39,8 @@ target 'gaimr_frontend' do
 
   pod 'ReactNativeART', :path => '../node_modules/@react-native-community/art'
 
+  pod 'react-native-geolocation', :path => '../node_modules/@react-native-community/geolocation'
+
   target 'gaimr_frontendTests' do
     inherit! :search_paths
     # Pods for testing

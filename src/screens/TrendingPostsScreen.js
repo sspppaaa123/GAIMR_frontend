@@ -157,7 +157,7 @@ import { FlatList, SafeAreaView, Text, View, TouchableOpacity, StyleSheet, Scrol
 import { Card, ListItem, Button, Icon } from 'react-native-elements';
 import LikeButton from '../components/LikeButton'
 import * as Progress from 'react-native-progress';
-
+import * as constants from '../constants'
 export default class TrendingPostsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
@@ -174,7 +174,7 @@ export default class TrendingPostsScreen extends React.Component {
       posts:[],
       streams:[],
       selectedStream:"",
-      ip:"http://gaimr-boot.herokuapp.com",
+      ip:constants.APIURL,
       progress:0,
     }
     this.votepoll = this.votepoll.bind(this);

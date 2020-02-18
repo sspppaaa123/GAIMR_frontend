@@ -7,6 +7,7 @@ import LikeButton from '../components/LikeButton'
 import ImageLoader from 'react-native-image-progress';
 import * as Progress from 'react-native-progress';
 import AddStream from "../components/AddStreamComponent";
+import * as constants from '../constants'
 export default class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
@@ -27,9 +28,13 @@ export default class HomeScreen extends React.Component {
         postId: "",
         choiceNo: ""
       },
-      ip: "http://gaimr-boot.herokuapp.com",
+      ip: constants.APIURL,
       selectedStream: "",
       progress: 0,
+      location: {
+        lat: null,
+        long: null
+      }
     },
       this.votepoll = this.votepoll.bind(this);
   }
@@ -219,12 +224,12 @@ export default class HomeScreen extends React.Component {
         )
       }
       pollView = (
-        <View style={{flex:1}}>
-          <View style={{flex:1,flexDirection:"row"}}>
-          <Text style={styles.question}>{item.poll.question}</Text>
-          <View style={{alignItems:"flex-end",flex:1,justifyContent:"center"}}>
-          <Text>{sum} votes</Text>
-          </View>
+        <View style={{ flex: 1 }}>
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <Text style={styles.question}>{item.poll.question}</Text>
+            <View style={{ alignItems: "flex-end", flex: 1, justifyContent: "center" }}>
+              <Text>{sum} votes</Text>
+            </View>
           </View>
           {choices}
         </View>
@@ -260,12 +265,11 @@ export default class HomeScreen extends React.Component {
   onRefresh = () => {
     this.setState({ isLoading: true }, function () { this.init() })
   }
-  goToNewStreamsPage=()=>
-  {
+  goToNewStreamsPage = () => {
     this.props.navigation.navigate('AddStream')
   }
   render() {
-    const listFooter=(<AddStream newStream={()=>{this.goToNewStreamsPage()}}/>)
+    const listFooter = (<AddStream newStream={() => { this.goToNewStreamsPage() }} />)
     console.log("rendering..", this.state.streams);
     return (
       <SafeAreaView style={styles.container}>
@@ -274,17 +278,19 @@ export default class HomeScreen extends React.Component {
             progress={this.state.progress}
             indeterminate={this.state.isLoading}
           /> */}
-          <View style={styles.streamContainer}>
-        <FlatList
-          horizontal={true}
-          data={this.state.streams}
-          renderItem={this.renderStreams}
-          keyExtractor={item => item.streamId}
-          ListFooterComponent={listFooter}
-          ListFooterComponentStyle={{justifyContent:"center",marginBottom:15
-        ,padding:10}}
-          style={{ flex:1 }}
-        />
+        <View style={styles.streamContainer}>
+          <FlatList
+            horizontal={true}
+            data={this.state.streams}
+            renderItem={this.renderStreams}
+            keyExtractor={item => item.streamId}
+            ListFooterComponent={listFooter}
+            ListFooterComponentStyle={{
+              justifyContent: "center", marginBottom: 15
+              , padding: 10
+            }}
+            style={{ flex: 1 }}
+          />
         </View>
         <FlatList
           data={this.state.posts}
@@ -347,7 +353,7 @@ const styles = StyleSheet.create({
   },
   streamContainer:
   {
-    flexDirection:"row",
-    height:"20%"
+    flexDirection: "row",
+    height: "20%"
   }
 });
