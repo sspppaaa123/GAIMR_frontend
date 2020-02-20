@@ -29,9 +29,6 @@ export default class LikeButton extends React.Component {
                         color={colorValue}
                         />
 				</TouchableOpacity>
-				{/* <Text style={styles.likeNumberStyle}>
-					{likeValue}
-				</Text> */}
 			</View>
 		);
 	}

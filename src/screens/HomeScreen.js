@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import { MenuButton, Logo, Middle } from "../components/header/header";
-import { FlatList, SafeAreaView, Text, View, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
-
+import { FlatList, SafeAreaView, Text, View, Picker,TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { Card, ListItem, Button, Icon } from 'react-native-elements';
 import LikeButton from '../components/LikeButton'
 import ImageLoader from 'react-native-image-progress';
 import * as Progress from 'react-native-progress';
 import AddStream from "../components/AddStreamComponent";
 import * as constants from '../constants'
+import moment from 'moment';
 export default class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
@@ -21,8 +22,11 @@ export default class HomeScreen extends React.Component {
     // this.state ={ isLoading: true, item: null, postdata:[],streamsdata:[],}
     this.state = {
       isLoading: true, item: null, bgcolor: "#ffc1cc",
+      colorValue:'white',
+      languages:[],
       posts: [],
       streams: [],
+      id:"null",
       post:
       {
         postId: "",
@@ -32,13 +36,33 @@ export default class HomeScreen extends React.Component {
       selectedStream: "",
       progress: 0,
       location: {
-        lat: null,
-        long: null
+        country: null,
+        countryCode: null,
+        city:null
       }
     },
       this.votepoll = this.votepoll.bind(this);
   }
   init() {
+    fetch("https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui=en&key=trnsl.1.1.20200220T121344Z.c778909133dea0eb.d97109a197b63b3c555216245931712815d07705",
+    {
+      method: 'GET',
+      headers:
+        {
+          'Content-Type': 'application/json',
+        }
+    }).then((response) => response.json())
+    .then((responseJson) => {
+      console.log(responseJson.langs)
+      this.setState({
+        isLoading: false,
+        languages: responseJson.langs
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+
     fetch(this.state.ip + '/posts/recentPosts/' + this.state.selectedStream,
       {
         method: 'GET',
@@ -145,12 +169,16 @@ export default class HomeScreen extends React.Component {
         this.updateLike(responseJSON)
       }).then(err => { console.log(err) })
   }
-  selectedStreamHandler = streamName => {
+
+  selectedStreamHandler(streamName,streamId){
     if (streamName === "All")
       streamName = ""
     this.setState({
+      colorValue: 'red',
+      id:streamId,
       selectedStream: streamName,
-      isLoading: true
+      isLoading: true,
+      streambg:"black"
     }, function () {
       this.init();
     })
@@ -158,6 +186,8 @@ export default class HomeScreen extends React.Component {
   renderItem = ({ item }) => {
     let postView = null;
     let pollView = null;
+    let locationView = null;
+    const postdate = moment(item.postDate).format('MMMM Do YYYY, h:mm:ss a'); 
     if (item.postType === "text") {
       postView = (
         <View key={item.postId}>
@@ -235,14 +265,28 @@ export default class HomeScreen extends React.Component {
         </View>
       )
     }
+    locationView =(
+      <View>
+        <View style={{display:"flex", flexDirection:"row", alignSelf:"flex-end"}}>
+        <Text>{item.location.city}, </Text>
+        <Text>{item.location.country}</Text>
+        </View>
+        <Text style={{textAlign:"right"}}>{postdate}</Text>
+      </View>
+    )
 
     return (
       <View style={styles.container}>
         <ScrollView style={styles.scrollstyle}>
           <Card key={item.postId}>
             <View style={styles.viewstyle}>
+              <View style={{ position: "absolute", justifyContent: "flex-end", end: 0}}>
+              {locationView}
+              </View>
+              <View style={{marginTop:35}}>
               {postView}
               {pollView}
+              </View>
               <Text style={styles.totalLikesText}>{item.postActivity.auditorLikes.length} likes</Text>
             </View>
           </Card>
@@ -251,13 +295,21 @@ export default class HomeScreen extends React.Component {
     )
   }
 
+  checkID(streamId)
+  {
+    if(this.state.id==streamId)
+      return true
+    else
+      return false
+  }
+
   renderStreams = ({ item }) => {
     return (
       <View style={{ padding: 20, paddingTop: 20, paddingBottom: 30 }}>
-        <TouchableOpacity style={{ alignItems: "center" }}
-          onPress={() => { this.selectedStreamHandler(item.streamName) }}>
-          <Image source={{ uri: item.streamLogo }} style={{ width: 50, height: 50 }} />
-          <Text>{item.streamName}</Text>
+        <TouchableOpacity style={{ alignItems: "center"}}
+          onPress={() => { this.selectedStreamHandler(item.streamName,item.streamId)}}>
+          <Image source={{ uri: item.streamLogo }} style={{ width: 50, height: 50,padding:10 }}/>
+          <Text style={{color:this.checkID(item.streamId)?'red':'white'}}>{item.streamName}</Text>
         </TouchableOpacity>
       </View>
     )
@@ -269,15 +321,18 @@ export default class HomeScreen extends React.Component {
     this.props.navigation.navigate('AddStream')
   }
   render() {
+    var obj = this.state.languages;
+    var codes = Object.keys(obj)
+    var langvalues = Object.keys(obj).map(function (key) { return obj[key]; });
+    var countries = []
+    {this.state.posts.map((value,i)=>countries.push(value.location.country))
+    }
+    var uniqueCountries = Array.from(new Set(countries))
     const listFooter = (<AddStream newStream={() => { this.goToNewStreamsPage() }} />)
     console.log("rendering..", this.state.streams);
     return (
       <SafeAreaView style={styles.container}>
-        {/* <Progress.Circle
-            style={styles.progress}
-            progress={this.state.progress}
-            indeterminate={this.state.isLoading}
-          /> */}
+   
         <View style={styles.streamContainer}>
           <FlatList
             horizontal={true}
@@ -292,6 +347,31 @@ export default class HomeScreen extends React.Component {
             style={{ flex: 1 }}
           />
         </View>
+
+        <View style={styles.pickerStyle}>
+        <Picker
+          selectedValue={this.state.selectedItem}
+          selectedValue={this.state.country}  
+                        onValueChange={(itemValue, itemPosition) =>  
+                            this.setState({country: itemValue, choosenIndex: itemPosition})}  
+                    >  
+          {uniqueCountries.map((value,i)=><Picker.Item label={value} value={value} key={i}/>)
+          } 
+        </Picker>
+        </View>
+
+        <View style={styles.pickerStyle}>
+        <Picker
+          selectedValue={this.state.selectedItem}
+          selectedValue={this.state.language}  
+                        onValueChange={(itemValue, itemPosition) =>  
+                            this.setState({language: itemValue, choosenIndex: itemPosition})}  
+          >
+          {langvalues.map((item,i)=><Picker.Item label={item} value={codes[i]} key={i}/>)
+          } 
+        </Picker>
+        </View>
+
         <FlatList
           data={this.state.posts}
           renderItem={this.renderItem}
@@ -312,11 +392,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccf7ff"
   },
   viewstyle: {
-    width: 350,
+    width: wp('85%'),
   },
   img: {
     width: "100%",
-    height: 300,
+    height: hp('50%'),
     padding: 10,
     borderWidth: 2,
     borderColor: "black",
@@ -354,6 +434,15 @@ const styles = StyleSheet.create({
   streamContainer:
   {
     flexDirection: "row",
-    height: "20%"
+    height: hp('13%'),
+    backgroundColor:"#42a5f5",
+  },
+  pickerStyle:{
+    borderColor: 'black',
+    backgroundColor: '#82c7ff',
+    borderRadius:20,
+    borderWidth: 2,
+    width: 200,
+    marginTop:10
   }
 });
