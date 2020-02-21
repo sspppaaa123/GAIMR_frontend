@@ -46,21 +46,20 @@ export default class PostScreen extends React.Component {
             isLoading: true,
             streams: [],
             ip: constants.APIURL,
-            location: {
-            },
-            isLocating:false
+            location: null,
+            isLocating: false
         }
     }
-    setLocation(address)
-    {
-        let location={
-            country:address.country,
-            countryCode:address.country_code.toUpperCase(),
-            city:address.city
+    setLocation(address) {
+        console.log("address", address)
+        let location = {
+            country: address.country,
+            countryCode: address.country_code.toUpperCase(),
+            city: address.city
         }
         this.setState({
-            location:location,
-            isLocating:false
+            location: location,
+            isLocating: false
         })
         console.log(this.state.location)
     }
@@ -82,7 +81,7 @@ export default class PostScreen extends React.Component {
     }
     geoSuccess = (pos) => {
         this.setState({
-            isLocating:true
+            isLocating: true
         })
         console.log(pos)
         let lat = pos.coords.latitude;
@@ -147,62 +146,66 @@ export default class PostScreen extends React.Component {
                 alert("Enter Atleast One #hashtag");
             }
             else {
-                if(this.state.isLocating==false)
-                {
-                let tags = []
-                tags = this.state.postText.match(/#\w+/g)
-                if (tags == null) {
-                    alert("Enter Atleast One #hashtag");
-                }
-                else {
-                    let hashtags = []
-                    for (let i = 0; i < tags.length; i++) {
-                        hashtags.push({ tagName: tags[i].substr(1) })
+                if (this.state.isLocating == false) {
+                    if (this.state.location == null) {
+                        alert("No Location")
                     }
-                    console.log("hastags", hashtags);
-                    let newPostRequest = this.state.postRequest;
-                    let fd = new FormData();
-                    if (this.state.selectedImage == null) {
-                        newPostRequest.postType = "text";
+                    else
+                    {
+                    let tags = []
+                    tags = this.state.postText.match(/#\w+/g)
+                    if (tags == null) {
+                        alert("Enter Atleast One #hashtag");
                     }
                     else {
-                        newPostRequest.postType = "image";
-                        let file = this.state.selectedImage
-                        fd.append("file", { name: file.fileName, type: file.type, uri: file.uri })
+                        let hashtags = []
+                        for (let i = 0; i < tags.length; i++) {
+                            hashtags.push({ tagName: tags[i].substr(1) })
+                        }
+                        console.log("hastags", hashtags);
+                        let newPostRequest = this.state.postRequest;
+                        let fd = new FormData();
+                        if (this.state.selectedImage == null) {
+                            newPostRequest.postType = "text";
+                        }
+                        else {
+                            newPostRequest.postType = "image";
+                            let file = this.state.selectedImage
+                            fd.append("file", { name: file.fileName, type: file.type, uri: file.uri })
+                        }
+                        newPostRequest.streamName = this.state.streamSelected;
+                        newPostRequest.postContent.text = this.state.postText;
+                        newPostRequest.hashtags = hashtags;
+                        newPostRequest.postDate = new Date();
+                        newPostRequest.location = this.state.location
+                        console.log("sending..", newPostRequest);
+                        fd.append("post", JSON.stringify(newPostRequest));
+                        console.log("fd", fd);
+                        fetch(constants.APIURL + "/posts/addPost", {
+                            method: "POST",
+                            body: fd
+                        }).then((response) => response.json())
+                            .then((responseJSON) => {
+                                console.log(responseJSON)
+                                this.setState({
+                                    isPosting: false,
+                                    selectedImage: null,
+                                    visible: false,
+                                    pollAdded: -1
+                                }, function () {
+                                    this.resetView();
+                                }
+                                )
+                                alert("posted!")
+                            })
+                            .then(error => { console.log("err", error) })
                     }
-                    newPostRequest.streamName = this.state.streamSelected;
-                    newPostRequest.postContent.text = this.state.postText;
-                    newPostRequest.hashtags = hashtags;
-                    newPostRequest.postDate = new Date();
-                    newPostRequest.location=this.state.location
-                    console.log("sending..", newPostRequest);
-                    fd.append("post", JSON.stringify(newPostRequest));
-                    console.log("fd", fd);
-                    fetch(constants.APIURL + "/posts/addPost", {
-                        method: "POST",
-                        body: fd
-                    }).then((response) => response.json())
-                        .then((responseJSON) => {
-                            console.log(responseJSON)
-                            this.setState({
-                                isPosting: false,
-                                selectedImage: null,
-                                visible: false,
-                                pollAdded: -1
-                            }, function () {
-                                this.resetView();
-                            }
-                            )
-                            alert("posted!")
-                        })
-                        .then(error => { console.log("err", error) })
                 }
             }
-            else
-            {
-                alert("locating")
+                else {
+                    alert("locating")
+                }
             }
-        }
         }
     }
     onChangePostText = text => {
