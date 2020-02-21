@@ -1,163 +1,12 @@
-// import { View, Text, StyleSheet, Image,TouchableOpacity } from "react-native";
-// import React, { Component } from "react";
-// import { MenuButton, Logo } from "../components/header/header";
-// import { ScrollView } from "react-native-gesture-handler";
-// import { Card, ListItem, Button, Icon } from 'react-native-elements';
-// import LikeButton from '../components/LikeButton'
-
-// const users = [
-//   {
-//      id: '1',
-//      title: 'Coco Cola Cool Advt',
-//      info: 'Hey! Grab a Cola and get 50% cashback',
-//      avatar: require('../assets/cococola.jpg'),
-
-//   },
-//   {
-//     id: '2',
-//     title: 'Maggi Advt',
-//     info: 'Buy 1 get 1 Freeeee',
-//     avatar: require('../assets/maggi.jpg'),
-
-//  },
-//  {
-//   id: '3',
-//   title: 'GoodDay Advt',
-//   info: 'Have a good day!',
-//   avatar: require('../assets/goodday.png'),
-
-// },
-// {
-//   id: '4',
-//   title: 'Ind vs NZ',
-//   info: 'Who is winning today??',
-//   avatar: require('../assets/match.jpg'),
-
-// },
-// {
-//   id: '5',
-//   title: 'CoronaVirus',
-//   info: 'Pls be careful! Take more of Vitamin C.',
-//   avatar: require('../assets/corona.jpg'),
-
-// },
-
-//  ];
-
-// export default class TrendingPostsScreen extends React.Component {
-//   static navigationOptions = ({ navigation }) => {
-//     return {
-//       headerLeft: ()=><MenuButton onPress={() => navigation.openDrawer()} />,
-//       headerRight:()=> (<Logo />),
-//     };
-//   };
-
-//   render() {
-//     return (
-//       <View style={styles.container}>
-//             <ScrollView style={styles.scrollstyle}>
-//                   {users.map((u,index) => {
-//                       return (
-//                       <Card key={index}>
-//                         <View key={index} style={styles.user}>
-//                                 <Image
-//                                   style={styles.avatar_card}
-//                                   resizeMode="cover"
-//                                   source={ u.avatar }
-//                                 />
-//                                 <Text style={styles.name}>{u.title}</Text>
-//                                 <Text style={styles.infostyle}>{u.info}</Text>
-//                                 <LikeButton />
-//                               </View>
-//                       </Card>);
-//                   })}
-//             </ScrollView>
-//       </View>
-//     );
-//   }
-// }
-
-// const styles = StyleSheet.create({
-//   container:{
-//     alignItems:'center'
-//   },
-//   header:{
-//     // marginTop: 10,
-//     backgroundColor: "#00BFFF",
-//     height:100,
-//     width:'100%',
-//     borderColor: "black",
-//     borderWidth: 2,
-//     borderBottomLeftRadius: 15,
-//     borderBottomRightRadius: 15,
-//     marginLeft:5,
-//     marginRight: 5,
-//   },
-//   avatar: {
-//     width: 80,
-//     height: 80,
-//     borderRadius: 63,
-//     borderWidth: 3,
-//     borderColor: "white",
-//     marginBottom:10,
-//     alignSelf:'flex-start',
-//     position: 'absolute',
-//     marginTop:10,
-//     marginLeft:5
-//   },
-//   avatar_card: {
-//     width: 350,
-//     height: 300,
-//     // borderRadius: 63,
-//     padding: 10,
-//     borderWidth: 2,
-//     borderColor: "black",
-//     marginBottom:20,
-//     alignSelf:'center',
-//     // position: 'absolute',
-//     marginLeft:5
-//   },
-//   bodyContent: {
-//     flex: 1,
-//     alignItems: 'flex-end',
-//     padding:5,
-//     marginRight:10,
-//     marginBottom: 10
-//   },
-//   name:{
-//     fontSize:28,
-//     color: "#696969",
-//     fontWeight: "600"
-//   },
-//   info:{
-//     fontSize:16,
-//     color: "#FFFFFF",
-//   },
-//   buttonContainer: {
-//       height:30,
-//       flexDirection: 'row',
-//       justifyContent: 'center',
-//       alignItems: 'center',
-//       marginBottom:10,
-//       width:100,
-//       borderRadius:15,
-//       backgroundColor: "white",
-//       paddingRight:5,
-//       paddingLeft: 5
-//   },
-//   followContainer: {
-//     flexDirection: 'row',
-// },
-
-// });
-
 import React, { Component } from "react";
 import { MenuButton, Logo, Middle } from "../components/header/header";
-import { FlatList, SafeAreaView, Text, View, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+import { FlatList, SafeAreaView, Text,Picker, View, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { Card, ListItem, Button, Icon } from 'react-native-elements';
 import LikeButton from '../components/LikeButton'
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import * as Progress from 'react-native-progress';
 import * as constants from '../constants'
+import moment from 'moment';
 export default class TrendingPostsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
@@ -170,8 +19,11 @@ export default class TrendingPostsScreen extends React.Component {
     super(props);
     // this.state ={ isLoading: true, item: null, postdata:[],trendingdata:[],}
     this.state = { 
-      isLoading: true, item: null, bgcolor: "#ffc1cc", 
-      posts:[],
+      isLoading: true, item: null, bgcolor: "#ffc1cc",
+      colorValue:'white',
+      languages:[],
+      id:"null",
+      posts: [], 
       streams:[],
       selectedStream:"",
       ip:constants.APIURL,
@@ -182,6 +34,24 @@ export default class TrendingPostsScreen extends React.Component {
 
 
   init() {
+    fetch("https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui=en&key=trnsl.1.1.20200220T121344Z.c778909133dea0eb.d97109a197b63b3c555216245931712815d07705",
+    {
+      method: 'GET',
+      headers:
+        {
+          'Content-Type': 'application/json',
+        }
+    }).then((response) => response.json())
+    .then((responseJson) => {
+      console.log(responseJson.langs)
+      this.setState({
+        isLoading: false,
+        languages: responseJson.langs
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+    });
     fetch(this.state.ip+'/posts/getTrendingPosts/'+this.state.selectedStream,
       {
         method: 'GET',
@@ -278,11 +148,13 @@ export default class TrendingPostsScreen extends React.Component {
   {
     this.setState({isLoading:true},function(){this.init()})
   }
-  selectedStreamHandler=streamName=>
+  selectedStreamHandler(streamName,streamId)
   {
     if(streamName==="All")
     streamName=""
     this.setState({
+      colorValue: 'red',
+      id:streamId,
       selectedStream:streamName,
       isLoading:true
     },function(){
@@ -292,6 +164,8 @@ export default class TrendingPostsScreen extends React.Component {
   renderItem = ({ item }) => {
     let postView = null;
     let pollView = null;
+    let locationView=null;
+    const postdate = moment(item.postDate).format('MMMM Do YYYY, h:mm:ss a'); 
     if (item.postType === "text") {
       postView = (
         <View key={item.postId}>
@@ -368,14 +242,28 @@ export default class TrendingPostsScreen extends React.Component {
         </View>
       )
     }
+    locationView =(
+      <View>
+        <View style={{display:"flex", flexDirection:"row", alignSelf:"flex-end"}}>
+        <Text>{item.location.city}, </Text>
+        <Text>{item.location.country}</Text>
+        </View>
+        <Text style={{textAlign:"right"}}>{postdate}</Text>
+      </View>
+    )
 
     return (
       <View style={styles.container}>
         <ScrollView style={styles.scrollstyle}>
           <Card key={item.postId}>
             <View style={styles.viewstyle}>
+            <View style={{ position: "absolute", justifyContent: "flex-end", end: 0}}>
+              {locationView}
+              </View>
+              <View style={{marginTop:35}}>
               {postView}
               {pollView}
+              </View>
               <Text style={styles.totalLikesText}>{item.postActivity.auditorLikes.length} likes</Text>
             </View>
           </Card>
@@ -384,31 +272,68 @@ export default class TrendingPostsScreen extends React.Component {
     )
   }
 
+  checkID(streamId)
+  {
+    if(this.state.id==streamId)
+      return true
+    else
+      return false
+  }
+
+
   renderStreams = ({ item }) => {
     return (
       <View style={{ padding: 20, paddingTop: 20, paddingBottom: 30}}>
-        <TouchableOpacity style={{alignItems:"center"}} onPress={()=>{this.selectedStreamHandler(item.streamName)}}>
-          <Image source={{ uri: item.streamLogo }} style={{ width: 50, height: 50 }} />
-          <Text>{item.streamName}</Text>
+        <TouchableOpacity style={{alignItems:"center"}} onPress={()=>{this.selectedStreamHandler(item.streamName,item.streamId)}}>
+          <Image source={{ uri: item.streamLogo }} style={{ width: 50, height: 50, padding:10 }} />
+          <Text style={{color:this.checkID(item.streamId)?'red':'white'}}>{item.streamName}</Text>
         </TouchableOpacity>
       </View>
     )
   }
 
   render() {
+    var obj = this.state.languages;
+    var codes = Object.keys(obj)
+    var langvalues = Object.keys(obj).map(function (key) { return obj[key]; });
+    var countries = []
+    {this.state.posts.map((value,i)=>countries.push(value.location.country))
+    }
+    var uniqueCountries = Array.from(new Set(countries))
     return (
       <SafeAreaView style={styles.container}>
+        <View style={styles.streamContainer}>
         <FlatList
           horizontal={true}
           data={this.state.streams}
           renderItem={this.renderStreams}
           keyExtractor={item => item.streamId}
         />
-        {/* <Progress.Circle
-            style={styles.progress}
-            progress={1}
-            indeterminate={this.state.isLoading}
-          /> */}
+        </View>
+          <View style={styles.pickerStyle}>
+        <Picker
+          selectedValue={this.state.selectedItem}
+          selectedValue={this.state.country}  
+                        onValueChange={(itemValue, itemPosition) =>  
+                            this.setState({country: itemValue, choosenIndex: itemPosition})}  
+                    >  
+          {uniqueCountries.map((value,i)=><Picker.Item label={value} value={value} key={i}/>)
+          } 
+        </Picker>
+        </View>
+
+        <View style={styles.pickerStyle}>
+        <Picker
+          selectedValue={this.state.selectedItem}
+          selectedValue={this.state.language}  
+                        onValueChange={(itemValue, itemPosition) =>  
+                            this.setState({language: itemValue, choosenIndex: itemPosition})}  
+          >
+          {langvalues.map((item,i)=><Picker.Item label={item} value={codes[i]} key={i}/>)
+          } 
+        </Picker>
+        </View>
+
         <FlatList
           data={this.state.posts}
           renderItem={this.renderItem}
@@ -421,7 +346,6 @@ export default class TrendingPostsScreen extends React.Component {
   }
 }
 
-
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
@@ -429,11 +353,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccf7ff"
   },
   viewstyle: {
-    width: 350,
+    width: wp('85%'),
   },
   img: {
     width: "100%",
-    height: 300,
+    height: hp('50%'),
     padding: 10,
     borderWidth: 2,
     borderColor: "black",
@@ -457,15 +381,30 @@ const styles = StyleSheet.create({
   {
     flexDirection: "row",
     padding: 5,
+    width: "100%"
   },
-  progress:
+  progress: {
+    margin: 10,
+  },
+  totalLikesText: {
+    marginTop: 10,
+    fontWeight: "bold",
+    color: "blue",
+    fontSize: 15
+  },
+  streamContainer:
   {
-    margin:10,
+    flexDirection: "row",
+    height: hp('13%'),
+    backgroundColor:"#42a5f5",
   },
-  totalLikesText:{
-    marginTop:10,
-    fontWeight:"bold",
-    color:"blue",
-    fontSize:15
+  pickerStyle:{
+    borderColor: 'black',
+    backgroundColor: '#82c7ff',
+    borderRadius:20,
+    borderWidth: 2,
+    width: 200,
+    marginTop:10
   }
 });
+
