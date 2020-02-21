@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { MenuButton, Logo, Middle } from "../components/header/header";
-import { FlatList, SafeAreaView, Text, View, Picker,TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import { FlatList, SafeAreaView, Text, View, Picker, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Card, ListItem, Button, Icon } from 'react-native-elements';
 import LikeButton from '../components/LikeButton'
 import ImageLoader from 'react-native-image-progress';
@@ -22,11 +22,12 @@ export default class HomeScreen extends React.Component {
     // this.state ={ isLoading: true, item: null, postdata:[],streamsdata:[],}
     this.state = {
       isLoading: true, item: null, bgcolor: "#ffc1cc",
-      colorValue:'white',
-      languages:[],
+      colorValue: 'white',
+      country:"",
+      languages: [],
       posts: [],
       streams: [],
-      id:"null",
+      id: "null",
       post:
       {
         postId: "",
@@ -38,7 +39,7 @@ export default class HomeScreen extends React.Component {
       location: {
         country: null,
         countryCode: null,
-        city:null
+        city: null
       }
     },
       this.votepoll = this.votepoll.bind(this);
@@ -119,10 +120,10 @@ export default class HomeScreen extends React.Component {
           question = post.postId + " xyz* " + poll.question
           for (let i = 0; i < poll.choices.length; i++) {
             let choice = poll.choices[i]
-            question += " xyz* "+ choice.choice
+            question += " xyz* " + choice.choice
           }
-          question=question.replace(/#/g,"ht")
-          console.log("questionPoll",question)
+          question = question.replace(/#/g, "ht")
+          console.log("questionPoll", question)
         }
         fetchURL += "&text=" + question
         fetchURL += "&lang=" + orgLanguage + "-" + targetLanguage;
@@ -134,15 +135,14 @@ export default class HomeScreen extends React.Component {
           let texts = respJSON.text;
           if (post.pollExists) {
             let translation = texts[posts.length + i]
-            translation=translation.replace(/ht/g,"#")
+            translation = translation.replace(/ht/g, "#")
             let translatedPoll = translation.split(' xyz* ')
             let qn = translatedPoll[1]
             console.log("translationPoll", translatedPoll)
-            for(let i=0;i<post.poll.choices.length;i++)
-            {
-              let choice=post.poll.choices[i];
-              choice.choice=translatedPoll[i+2]
-              post.poll.choices[i]=choice
+            for (let i = 0; i < post.poll.choices.length; i++) {
+              let choice = post.poll.choices[i];
+              choice.choice = translatedPoll[i + 2]
+              post.poll.choices[i] = choice
             }
             post.poll.question = qn;
             translatedPosts[i] = post
@@ -157,33 +157,24 @@ export default class HomeScreen extends React.Component {
     console.log("translatedPosts", translatedPosts)
 
   }
-  init() {
-    fetch("https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui=en&key=trnsl.1.1.20200220T121344Z.c778909133dea0eb.d97109a197b63b3c555216245931712815d07705",
+  getposts()
+  {
+    let fetchURL=this.state.ip + '/posts/recentPosts';
+    if(this.state.selectedStream==='')
     {
-      method: 'GET',
-      headers:
-        {
-          'Content-Type': 'application/json',
-        }
-    }).then((response) => response.json())
-    .then((responseJson) => {
-      console.log(responseJson.langs)
-      this.setState({
-        isLoading: false,
-        languages: responseJson.langs
-      });
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-
-    fetch(this.state.ip + '/posts/recentPosts/' + this.state.selectedStream,
+      fetchURL+='?country='+''
+    }
+    else
+    {
+      fetchURL+='/'+this.state.selectedStream+'?country='+''
+    }
+    fetch(fetchURL,
       {
         method: 'GET',
         headers:
         {
           'Content-Type': 'application/json',
-        }
+        },
       })
       .then((response) => response.json())
       .then((responseJson) => {
@@ -193,11 +184,13 @@ export default class HomeScreen extends React.Component {
           posts: responseJson
         });
 
-      }).then(() => this.translatePosts("en", "hi"))
+      })
       .catch((error) => {
         console.error(error);
       });
-
+  }
+  getStreams()
+  {
     fetch(this.state.ip + '/streams')
       .then((response) => response.json())
       .then((responseJson) => {
@@ -206,10 +199,33 @@ export default class HomeScreen extends React.Component {
           isLoading: false,
           streams: responseJson,
         });
-      }).then(() => this.translateStreams("en", "fr"))
+      })
       .catch((error) => {
         console.error(error);
       });
+  }
+  init() {
+    fetch("https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui=en&key=trnsl.1.1.20200220T121344Z.c778909133dea0eb.d97109a197b63b3c555216245931712815d07705",
+      {
+        method: 'GET',
+        headers:
+        {
+          'Content-Type': 'application/json',
+        }
+      }).then((response) => response.json())
+      .then((responseJson) => {
+        console.log(responseJson.langs)
+        this.setState({
+          isLoading: false,
+          languages: responseJson.langs
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+      this.getposts()
+      this.getStreams()
+    
   }
   componentDidMount() {
     this.init()
@@ -282,15 +298,15 @@ export default class HomeScreen extends React.Component {
       }).then(err => { console.log(err) })
   }
 
-  selectedStreamHandler(streamName,streamId){
+  selectedStreamHandler(streamName, streamId) {
     if (streamName === "All")
       streamName = ""
     this.setState({
       colorValue: 'red',
-      id:streamId,
+      id: streamId,
       selectedStream: streamName,
       isLoading: true,
-      streambg:"black"
+      streambg: "black"
     }, function () {
       this.init();
     })
@@ -299,7 +315,7 @@ export default class HomeScreen extends React.Component {
     let postView = null;
     let pollView = null;
     let locationView = null;
-    const postdate = moment(item.postDate).format('MMMM Do YYYY, h:mm:ss a'); 
+    const postdate = moment(item.postDate).format('MMMM Do YYYY, h:mm:ss a');
     if (item.postType === "text") {
       postView = (
         <View key={item.postId}>
@@ -377,13 +393,13 @@ export default class HomeScreen extends React.Component {
         </View>
       )
     }
-    locationView =(
+    locationView = (
       <View>
-        <View style={{display:"flex", flexDirection:"row", alignSelf:"flex-end"}}>
-        <Text>{item.location.city}, </Text>
-        <Text>{item.location.country}</Text>
+        <View style={{ display: "flex", flexDirection: "row", alignSelf: "flex-end" }}>
+          <Text>{item.location.city}, </Text>
+          <Text>{item.location.country}</Text>
         </View>
-        <Text style={{textAlign:"right"}}>{postdate}</Text>
+        <Text style={{ textAlign: "right" }}>{postdate}</Text>
       </View>
     )
 
@@ -392,12 +408,12 @@ export default class HomeScreen extends React.Component {
         <ScrollView style={styles.scrollstyle}>
           <Card key={item.postId}>
             <View style={styles.viewstyle}>
-              <View style={{ position: "absolute", justifyContent: "flex-end", end: 0}}>
-              {locationView}
+              <View style={{ position: "absolute", justifyContent: "flex-end", end: 0 }}>
+                {locationView}
               </View>
-              <View style={{marginTop:35}}>
-              {postView}
-              {pollView}
+              <View style={{ marginTop: 35 }}>
+                {postView}
+                {pollView}
               </View>
               <Text style={styles.totalLikesText}>{item.postActivity.auditorLikes.length} likes</Text>
             </View>
@@ -407,9 +423,8 @@ export default class HomeScreen extends React.Component {
     )
   }
 
-  checkID(streamId)
-  {
-    if(this.state.id==streamId)
+  checkID(streamId) {
+    if (this.state.id == streamId)
       return true
     else
       return false
@@ -418,17 +433,10 @@ export default class HomeScreen extends React.Component {
   renderStreams = ({ item }) => {
     return (
       <View style={{ padding: 20, paddingTop: 20, paddingBottom: 30 }}>
-<<<<<<< HEAD
         <TouchableOpacity style={{ alignItems: "center" }}
-          onPress={() => { this.selectedStreamHandler(item.streamName) }}>
-          <Image source={{ uri: item.streamLogo }} style={{ width: 50, height: 50 }} />
-          <Text style={{ fontSize: 20 }}>{item.streamName}</Text>
-=======
-        <TouchableOpacity style={{ alignItems: "center"}}
-          onPress={() => { this.selectedStreamHandler(item.streamName,item.streamId)}}>
-          <Image source={{ uri: item.streamLogo }} style={{ width: 50, height: 50,padding:10 }}/>
-          <Text style={{color:this.checkID(item.streamId)?'red':'white'}}>{item.streamName}</Text>
->>>>>>> a7c565f1b1d5737c2eaaa5a988b18ddae77c2837
+          onPress={() => { this.selectedStreamHandler(item.streamName, item.streamId) }}>
+          <Image source={{ uri: item.streamLogo }} style={{ width: 50, height: 50, padding: 10 }} />
+          <Text style={{ color: this.checkID(item.streamId) ? 'red' : 'white' }}>{item.streamName}</Text>
         </TouchableOpacity>
       </View>
     )
@@ -444,14 +452,22 @@ export default class HomeScreen extends React.Component {
     var codes = Object.keys(obj)
     var langvalues = Object.keys(obj).map(function (key) { return obj[key]; });
     var countries = []
-    {this.state.posts.map((value,i)=>countries.push(value.location.country))
+    {
+      this.state.posts.map((value, i) => countries.push(value.location))
     }
-    var uniqueCountries = Array.from(new Set(countries))
+    var flags = {};
+    var uniqueCountries = countries.filter(function (entry) {
+      if (flags[entry.countryCode]) {
+        return false;
+      }
+      flags[entry.countryCode] = true;
+      return true;
+    });
     const listFooter = (<AddStream newStream={() => { this.goToNewStreamsPage() }} />)
     console.log("rendering..", this.state.streams);
     return (
       <SafeAreaView style={styles.container}>
-   
+
         <View style={styles.streamContainer}>
           <FlatList
             horizontal={true}
@@ -468,27 +484,37 @@ export default class HomeScreen extends React.Component {
         </View>
 
         <View style={styles.pickerStyle}>
-        <Picker
-          selectedValue={this.state.selectedItem}
-          selectedValue={this.state.country}  
-                        onValueChange={(itemValue, itemPosition) =>  
-                            this.setState({country: itemValue, choosenIndex: itemPosition})}  
-                    >  
-          {uniqueCountries.map((value,i)=><Picker.Item label={value} value={value} key={i}/>)
-          } 
-        </Picker>
+          <Picker
+            selectedValue={this.state.selectedItem}
+            selectedValue={this.state.country}
+            onValueChange={(itemValue, itemPosition) => {
+              this.setState(
+                {
+                  country: itemValue,
+                  choosenIndex: itemPosition
+                }
+              )
+              this.getposts()
+            }
+            }
+          >
+            {uniqueCountries.map((value, i) =>
+              <Picker.Item label={value.country}
+                value={value.countryCode} key={i} />)
+            }
+          </Picker>
         </View>
 
         <View style={styles.pickerStyle}>
-        <Picker
-          selectedValue={this.state.selectedItem}
-          selectedValue={this.state.language}  
-                        onValueChange={(itemValue, itemPosition) =>  
-                            this.setState({language: itemValue, choosenIndex: itemPosition})}  
+          <Picker
+            selectedValue={this.state.selectedItem}
+            selectedValue={this.state.language}
+            onValueChange={(itemValue, itemPosition) =>
+              this.setState({ language: itemValue, choosenIndex: itemPosition })}
           >
-          {langvalues.map((item,i)=><Picker.Item label={item} value={codes[i]} key={i}/>)
-          } 
-        </Picker>
+            {langvalues.map((item, i) => <Picker.Item label={item} value={codes[i]} key={i} />)
+            }
+          </Picker>
         </View>
 
         <FlatList
@@ -554,14 +580,14 @@ const styles = StyleSheet.create({
   {
     flexDirection: "row",
     height: hp('13%'),
-    backgroundColor:"#42a5f5",
+    backgroundColor: "#42a5f5",
   },
-  pickerStyle:{
+  pickerStyle: {
     borderColor: 'black',
     backgroundColor: '#82c7ff',
-    borderRadius:20,
+    borderRadius: 20,
     borderWidth: 2,
     width: 200,
-    marginTop:10
+    marginTop: 10
   }
 });

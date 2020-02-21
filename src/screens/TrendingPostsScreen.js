@@ -28,11 +28,59 @@ export default class TrendingPostsScreen extends React.Component {
       selectedStream:"",
       ip:constants.APIURL,
       progress:0,
+      country:''
     }
     this.votepoll = this.votepoll.bind(this);
   }
+  getStreams()
+  {
+    fetch(this.state.ip+'/streams')
+    .then((response) => response.json())
+    .then((responseJson) => {
+      console.log(responseJson)
+      this.setState({
+        isLoading: false,
+        streams: responseJson,
+      }, function () {
+      });
 
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  }
+  getPosts()
+  {
+    let fetchURL=this.state.ip+'/posts/getTrendingPosts'
+    if(this.state.selectedStream=='')
+    {
+      fetchURL+='?country='+''
+    }
+    else
+    {
+      fetchURL+='/'+this.state.selectedStream+'?country='+''
+    }
+    fetch(fetchURL,
+    {
+      method: 'GET',
+      headers:
+      {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+      console.log(responseJson)
+      this.setState({
+        isLoading: false,
+        posts: responseJson
+      });
 
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  }
   init() {
     fetch("https://translate.yandex.net/api/v1.5/tr.json/getLangs?ui=en&key=trnsl.1.1.20200220T121344Z.c778909133dea0eb.d97109a197b63b3c555216245931712815d07705",
     {
@@ -52,41 +100,9 @@ export default class TrendingPostsScreen extends React.Component {
     .catch((error) => {
       console.error(error);
     });
-    fetch(this.state.ip+'/posts/getTrendingPosts/'+this.state.selectedStream,
-      {
-        method: 'GET',
-        headers:
-        {
-          'Content-Type': 'application/json',
-        }
-      })
-      .then((response) => response.json())
-      .then((responseJson) => {
-        console.log(responseJson)
-        this.setState({
-          isLoading: false,
-          posts: responseJson
-        });
-
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-
-    fetch(this.state.ip+'/streams')
-      .then((response) => response.json())
-      .then((responseJson) => {
-        console.log(responseJson)
-        this.setState({
-          isLoading: false,
-          streams: responseJson,
-        }, function () {
-        });
-
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  
+    this.getPosts()
+    this.getStreams()
   }
   componentDidMount()
   {
