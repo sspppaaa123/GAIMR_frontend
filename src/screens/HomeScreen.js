@@ -24,6 +24,10 @@ export default class HomeScreen extends React.Component {
       isLoading: true, item: null, bgcolor: "#ffc1cc",
       colorValue: 'white',
       country:"",
+      countries:[{
+        country:"All",
+        countryCode:""
+      }],
       languages: [],
       posts: [],
       streams: [],
@@ -157,16 +161,33 @@ export default class HomeScreen extends React.Component {
     console.log("translatedPosts", translatedPosts)
 
   }
-  getposts()
+  setCountries(countries)
+  {
+    let newCountries=countries;
+    newCountries.push({country:"All",countryCode:""})
+    this.setState({
+      countries:newCountries
+    })
+  }
+  getCountries()
+  {
+    let fetchURL=this.state.ip+'/posts/getCountries';
+    fetch(fetchURL).then((resp)=>resp.json())
+    .then((respJSON)=>{
+      console.log("countries",respJSON)
+      this.setCountries(respJSON)
+  })
+  }
+  getPosts()
   {
     let fetchURL=this.state.ip + '/posts/recentPosts';
     if(this.state.selectedStream==='')
     {
-      fetchURL+='?country='+''
+      fetchURL+='?country='+this.state.country
     }
     else
     {
-      fetchURL+='/'+this.state.selectedStream+'?country='+''
+      fetchURL+='/'+this.state.selectedStream+'?country='+this.state.country
     }
     fetch(fetchURL,
       {
@@ -223,8 +244,9 @@ export default class HomeScreen extends React.Component {
       .catch((error) => {
         console.error(error);
       });
-      this.getposts()
+      this.getPosts()
       this.getStreams()
+      this.getCountries()
     
   }
   componentDidMount() {
@@ -451,18 +473,18 @@ export default class HomeScreen extends React.Component {
     var obj = this.state.languages;
     var codes = Object.keys(obj)
     var langvalues = Object.keys(obj).map(function (key) { return obj[key]; });
-    var countries = []
-    {
-      this.state.posts.map((value, i) => countries.push(value.location))
-    }
-    var flags = {};
-    var uniqueCountries = countries.filter(function (entry) {
-      if (flags[entry.countryCode]) {
-        return false;
-      }
-      flags[entry.countryCode] = true;
-      return true;
-    });
+    // var countries = []
+    // {
+    //   this.state.posts.map((value, i) => countries.push(value.location))
+    // }
+    // var flags = {};
+    // var uniqueCountries = countries.filter(function (entry) {
+    //   if (flags[entry.countryCode]) {
+    //     return false;
+    //   }
+    //   flags[entry.countryCode] = true;
+    //   return true;
+    // });
     const listFooter = (<AddStream newStream={() => { this.goToNewStreamsPage() }} />)
     console.log("rendering..", this.state.streams);
     return (
@@ -487,20 +509,21 @@ export default class HomeScreen extends React.Component {
           <Picker
             selectedValue={this.state.selectedItem}
             selectedValue={this.state.country}
-            onValueChange={(itemValue, itemPosition) => {
+            onValueChange={(itemValue) => {
               this.setState(
                 {
                   country: itemValue,
-                  choosenIndex: itemPosition
+                },function()
+                {
+                  this.getPosts()
                 }
               )
-              this.getposts()
             }
             }
           >
-            {uniqueCountries.map((value, i) =>
+            {this.state.countries.map((value, i) =>
               <Picker.Item label={value.country}
-                value={value.countryCode} key={i} />)
+                value={value.countryCode} key={value.countryCode} />)
             }
           </Picker>
         </View>

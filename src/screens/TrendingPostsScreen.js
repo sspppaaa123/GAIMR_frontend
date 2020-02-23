@@ -28,9 +28,30 @@ export default class TrendingPostsScreen extends React.Component {
       selectedStream:"",
       ip:constants.APIURL,
       progress:0,
-      country:''
+      country:'',
+      countries:[{
+        country:"All",
+        countryCode:""
+      }]
     }
     this.votepoll = this.votepoll.bind(this);
+  }
+  setCountries(countries)
+  {
+    let newCountries=countries;
+    newCountries.push({country:"All",countryCode:""})
+    this.setState({
+      countries:newCountries
+    })
+  }
+  getCountries()
+  {
+    let fetchURL=this.state.ip+'/posts/getCountries';
+    fetch(fetchURL).then((resp)=>resp.json())
+    .then((respJSON)=>{
+      console.log("countries",respJSON)
+      this.setCountries(respJSON)
+  })
   }
   getStreams()
   {
@@ -54,11 +75,11 @@ export default class TrendingPostsScreen extends React.Component {
     let fetchURL=this.state.ip+'/posts/getTrendingPosts'
     if(this.state.selectedStream=='')
     {
-      fetchURL+='?country='+''
+      fetchURL+='?country='+this.state.country
     }
     else
     {
-      fetchURL+='/'+this.state.selectedStream+'?country='+''
+      fetchURL+='/'+this.state.selectedStream+'?country='+this.state.country
     }
     fetch(fetchURL,
     {
@@ -103,6 +124,7 @@ export default class TrendingPostsScreen extends React.Component {
   
     this.getPosts()
     this.getStreams()
+    this.getCountries()
   }
   componentDidMount()
   {
@@ -312,10 +334,6 @@ export default class TrendingPostsScreen extends React.Component {
     var obj = this.state.languages;
     var codes = Object.keys(obj)
     var langvalues = Object.keys(obj).map(function (key) { return obj[key]; });
-    var countries = []
-    {this.state.posts.map((value,i)=>countries.push(value.location.country))
-    }
-    var uniqueCountries = Array.from(new Set(countries))
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.streamContainer}>
@@ -327,15 +345,26 @@ export default class TrendingPostsScreen extends React.Component {
         />
         </View>
           <View style={styles.pickerStyle}>
-        <Picker
-          selectedValue={this.state.selectedItem}
-          selectedValue={this.state.country}  
-                        onValueChange={(itemValue, itemPosition) =>  
-                            this.setState({country: itemValue, choosenIndex: itemPosition})}  
-                    >  
-          {uniqueCountries.map((value,i)=><Picker.Item label={value} value={value} key={i}/>)
-          } 
-        </Picker>
+          <Picker
+            selectedValue={this.state.selectedItem}
+            selectedValue={this.state.country}
+            onValueChange={(itemValue) => {
+              this.setState(
+                {
+                  country: itemValue,
+                },function()
+                {
+                  this.getPosts()
+                }
+              )
+            }
+            }
+          >
+            {this.state.countries.map((value, i) =>
+              <Picker.Item label={value.country}
+                value={value.countryCode} key={value.countryCode} />)
+            }
+          </Picker>
         </View>
 
         <View style={styles.pickerStyle}>
